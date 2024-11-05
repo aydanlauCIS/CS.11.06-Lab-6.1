@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class AdventureTime {
@@ -9,10 +10,16 @@ public class AdventureTime {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
+        String testfile = "inputOneTwo.txt";
+        int challengeOneAnswer = challengeOne(testfile);
+        int challengeTwoAnswer = challengeTwo(testfile);
 
+        String testfiletwo = "inputThreeFour.txt";
+        int challengeThreeAnswer = challengeThree(testfiletwo);
+        int challengeFourAnswer = challengeFour(testfiletwo);
 
+        writeFileAllAnswers("AdventureTime.txt", challengeOneAnswer, challengeTwoAnswer, challengeThreeAnswer, challengeFourAnswer);
     }
-
     /** TODO 1
      *
      * Challenge 1
@@ -22,7 +29,17 @@ public class AdventureTime {
      * @throws IOException
      */
     public static int challengeOne(String fileName) throws IOException {
-        return 0;
+        int[] depths = readFile(fileName);
+        int array_length = depths.length;
+
+        int increased = 0;
+        for (int i = 1; i < array_length; i++) {
+            if (depths[i] - depths[i - 1] > 0) {
+                increased++;
+            }
+        }
+
+        return increased;
     }
 
     /** TODO 2
@@ -34,7 +51,20 @@ public class AdventureTime {
      * @throws FileNotFoundException
      */
     public static int challengeTwo(String fileName) throws FileNotFoundException {
-        return 0;
+        int[] depths = readFile(fileName);
+        int array_length = depths.length;
+
+        int prev_sum = depths[0] + depths[1] + depths[2];
+        int curr_sum, increased = 0;
+        for (int i = 1; i < array_length - 2; i++) {
+            curr_sum = depths[i] + depths[i + 1] + depths[i + 2];
+            if (curr_sum > prev_sum) {
+                increased++;
+            }
+            prev_sum = curr_sum;
+        }
+
+        return increased;
     }
 
     /** TODO 3
@@ -46,7 +76,19 @@ public class AdventureTime {
      * @throws FileNotFoundException
      */
     public static int challengeThree(String fileName) throws FileNotFoundException {
-        return 0;
+        String[][] instructions = readFileTwo(fileName);
+        int x = 0, y = 0;
+        for (String[] inst: instructions) {
+            String dir = inst[0];
+            int mag = Integer.parseInt(inst[1]);
+            switch (dir) {
+                case "forward" -> x += mag;
+                case "down" -> y += mag;
+                case "up" -> y -= mag;
+            }
+        }
+
+        return x * y;
     }
 
     /** TODO 4
@@ -58,7 +100,23 @@ public class AdventureTime {
      * @throws FileNotFoundException
      */
     public static int challengeFour(String filename) throws FileNotFoundException {
-        return 0;
+        String[][] instructions = readFileTwo(filename);
+        int x = 0, y = 0, aim = 0;
+        for (String[] inst: instructions) {
+            String dir = inst[0];
+            int mag = Integer.parseInt(inst[1]);
+
+            switch (dir) {
+                case "forward" -> {
+                    x += mag;
+                    y += aim * mag;
+                }
+                case "up" -> aim -= mag;
+                case "down" -> aim += mag;
+            }
+        }
+
+        return x * y;
     }
 
     /** This method will write the values passed as challengeOne, challengeTwo, challengeThree, and challengeFour to a text file.
@@ -88,6 +146,21 @@ public class AdventureTime {
         }
         scanner.close();
         return data;
+    }
+
+    private static String[][] readFileTwo(String inputFilename) throws FileNotFoundException {
+        File file = new File(inputFilename);
+        Scanner scanner = new Scanner(file);
+        int numberOfLinesInFile = countLinesInFile(inputFilename);
+        int[] data = new int[numberOfLinesInFile];
+
+        String[][] instructions = new String[numberOfLinesInFile][2];
+        int index = 0;
+        while (scanner.hasNextLine()) {
+            instructions[index++] = scanner.nextLine().split(" ");
+        }
+        scanner.close();
+        return instructions;
     }
 
     /** This method will count the number of lines in a text file, which it will return.
